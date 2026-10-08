@@ -1,5 +1,16 @@
 # auth.md Changelog
 
+## Unreleased
+
+Adds `did_key`, a registration type for agents whose identity is an Ed25519 `did:key`: proof of key possession by challenge-response, with no provider, JWKS or DID resolution (proposed in #3).
+
+### Added
+
+- `did_key` registration type at `/agent/identity`: `{ "type": "did_key", "did", "challenge", "signature", "credential_type" }`. The signed string binds the service's `issuer`, so a challenge can't be relayed from another service.
+- `agent_auth.did_key` discovery block: `challenge_endpoint`, `credential_types_supported`, `request_signing`.
+- Two credential types. `identity_assertion` (`sub` = DID) joins the normal Step 5 exchange. `signed_request` issues no token: the agent signs every call (RFC 9421 by default), for services that authenticate each request by key.
+- `did_key_not_enabled` and `invalid_challenge` error codes.
+
 ## v0.6.0 (2026-06-10)
 
 Splits the email-based registration path out from `identity_assertion` and into a top-level `service_auth` registration type, with a body modeled on [OIDC CIBA](https://openid.net/specs/openid-client-initiated-backchannel-authentication-core-1_0.html)'s `login_hint`. The previous shape was honest about how it worked — the service was verifying the email, not the agent — but it was filed under `identity_assertion` like the agent was asserting something. CIBA's vocabulary fits: the agent is hinting at who the user is, and the service authenticates the user out-of-band.
